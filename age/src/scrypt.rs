@@ -11,9 +11,9 @@ use age_core::{
 };
 use base64::{prelude::BASE64_STANDARD_NO_PAD, Engine};
 use rand::{
-    distributions::{Alphanumeric, DistString},
+    distr::{Alphanumeric, SampleString},
     rngs::OsRng,
-    RngCore,
+    RngCore, TryRngCore,
 };
 use zeroize::Zeroize;
 
@@ -139,7 +139,7 @@ impl crate::Recipient for Recipient {
         &self,
         file_key: &FileKey,
     ) -> Result<(Vec<Stanza>, HashSet<String>), EncryptError> {
-        let mut rng = OsRng;
+        let mut rng = OsRng.unwrap_err();
 
         let mut salt = [0; SALT_LEN];
         rng.fill_bytes(&mut salt);

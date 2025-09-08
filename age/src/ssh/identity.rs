@@ -12,7 +12,7 @@ use nom::{
     sequence::{pair, preceded, terminated, tuple},
     IResult,
 };
-use rand::rngs::OsRng;
+use rand::{rngs::OsRng, TryRngCore};
 use rsa::{pkcs1::DecodeRsaPrivateKey, Oaep};
 use sha2::{Digest, Sha256, Sha512};
 use std::fmt;
@@ -68,7 +68,7 @@ impl UnencryptedKey {
                     return None;
                 }
 
-                let mut rng = OsRng;
+                let mut rng = OsRng.unwrap_err();
 
                 // A failure to decrypt is fatal, because we assume that we won't
                 // encounter 32-bit collisions on the key tag embedded in the header.

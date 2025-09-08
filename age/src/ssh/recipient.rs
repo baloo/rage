@@ -18,7 +18,7 @@ use nom::{
     sequence::{pair, preceded, separated_pair},
     IResult,
 };
-use rand::rngs::OsRng;
+use rand::{rngs::OsRng, TryRngCore};
 use rsa::{traits::PublicKeyParts, Oaep};
 use sha2::Sha256;
 use x25519_dalek::{EphemeralSecret, PublicKey as X25519PublicKey, StaticSecret};
@@ -150,7 +150,7 @@ impl crate::Recipient for Recipient {
         &self,
         file_key: &FileKey,
     ) -> Result<(Vec<Stanza>, HashSet<String>), EncryptError> {
-        let mut rng = OsRng;
+        let mut rng = OsRng.unwrap_err();
 
         let stanzas = match self {
             Recipient::SshRsa(ssh_key, pk) => {
@@ -173,7 +173,7 @@ impl crate::Recipient for Recipient {
             Recipient::SshEd25519(ssh_key, ed25519_pk) => {
                 let pk: X25519PublicKey = ed25519_pk.to_montgomery().to_bytes().into();
 
-                let esk = EphemeralSecret::random_from_rng(rng);
+                let esk = EphemeralSecret::random_from_rng(&mut rng);
                 let epk: X25519PublicKey = (&esk).into();
 
                 let tweak: StaticSecret =
