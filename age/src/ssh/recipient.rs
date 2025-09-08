@@ -7,27 +7,28 @@ use age_core::{
     secrecy::ExposeSecret,
 };
 use base64::{
-    prelude::{BASE64_STANDARD, BASE64_STANDARD_NO_PAD},
     Engine,
+    prelude::{BASE64_STANDARD, BASE64_STANDARD_NO_PAD},
 };
 use curve25519_dalek::edwards::EdwardsPoint;
 use nom::{
+    IResult,
     branch::alt,
     bytes::streaming::{is_not, tag},
     combinator::map_opt,
     sequence::{pair, preceded, separated_pair},
-    IResult,
 };
-use rand::{rngs::OsRng, TryRngCore};
-use rsa::{traits::PublicKeyParts, Oaep};
+use rand::{TryRngCore, rngs::OsRng};
+use rsa::{Oaep, traits::PublicKeyParts};
 use sha2::Sha256;
 use x25519_dalek::{EphemeralSecret, PublicKey as X25519PublicKey, StaticSecret};
 
 use super::{
+    EncryptedKey, SSH_ED25519_KEY_PREFIX, SSH_ED25519_RECIPIENT_KEY_LABEL,
+    SSH_ED25519_RECIPIENT_TAG, SSH_RSA_KEY_PREFIX, SSH_RSA_OAEP_LABEL, SSH_RSA_RECIPIENT_TAG,
+    UnsupportedKey,
     identity::{Identity, UnencryptedKey},
-    read_ssh, ssh_tag, EncryptedKey, UnsupportedKey, SSH_ED25519_KEY_PREFIX,
-    SSH_ED25519_RECIPIENT_KEY_LABEL, SSH_ED25519_RECIPIENT_TAG, SSH_RSA_KEY_PREFIX,
-    SSH_RSA_OAEP_LABEL, SSH_RSA_RECIPIENT_TAG,
+    read_ssh, ssh_tag,
 };
 use crate::{
     error::EncryptError,

@@ -3,16 +3,16 @@
 use age_core::secrecy::{ExposeSecret, SecretString};
 use pinentry::{ConfirmationDialog, PassphraseInput};
 use rand::{
+    CryptoRng, RngCore, TryRngCore,
     distr::{Distribution, Uniform},
     rngs::OsRng,
-    CryptoRng, RngCore, TryRngCore,
 };
 use rpassword::prompt_password;
 
 use std::io;
 use subtle::ConstantTimeEq;
 
-use crate::{fl, Callbacks};
+use crate::{Callbacks, fl};
 
 mod error;
 pub use error::ReadError;
@@ -212,7 +212,7 @@ pub fn read_or_generate_passphrase() -> pinentry::Result<Passphrase> {
     )?;
 
     if res.expose_secret().is_empty() {
-        Ok(Passphrase::random(&mut OsRng.unwrap_mut()))
+        Ok(Passphrase::random(OsRng.unwrap_mut()))
     } else {
         Ok(Passphrase::Typed(res))
     }

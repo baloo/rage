@@ -136,7 +136,7 @@ impl EncryptedKey {
 }
 
 mod decrypt {
-    use aes::cipher::{block_padding::NoPadding, BlockModeDecrypt, KeyIvInit, StreamCipher};
+    use aes::cipher::{BlockModeDecrypt, KeyIvInit, StreamCipher, block_padding::NoPadding};
     use aes_gcm::aead::{Aead, KeyInit};
     use age_core::secrecy::SecretString;
     use cipher::array::{Array, ArraySize};
@@ -197,20 +197,20 @@ mod read_ssh {
     use age_core::secrecy::SecretBox;
     use curve25519_dalek::edwards::{CompressedEdwardsY, EdwardsPoint};
     use nom::{
+        IResult,
         branch::alt,
         bytes::complete::{tag, take},
         combinator::{flat_map, map, map_opt, map_parser, map_res, recognize, rest, verify},
         multi::{length_data, length_value},
         number::complete::be_u32,
         sequence::{delimited, pair, preceded, terminated, tuple},
-        IResult,
     };
     use rsa::BoxedUint;
 
     use super::{
-        identity::{UnencryptedKey, UnsupportedKey},
         EncryptedKey, Identity, OpenSshCipher, OpenSshKdf, SSH_ED25519_KEY_PREFIX,
         SSH_RSA_KEY_PREFIX,
+        identity::{UnencryptedKey, UnsupportedKey},
     };
 
     /// The SSH `string` [data type](https://tools.ietf.org/html/rfc4251#section-5).
@@ -400,11 +400,7 @@ mod read_ssh {
             // Repeated checkint, intended for verifying correct decryption.
             // Don't copy this idea into a new protocol; use an AEAD instead.
             map_opt(pair(take(4usize), take(4usize)), |(c1, c2)| {
-                if c1 == c2 {
-                    Some(c1)
-                } else {
-                    None
-                }
+                if c1 == c2 { Some(c1) } else { None }
             }),
             alt((
                 map(openssh_rsa_privkey, move |sk| {
@@ -527,8 +523,8 @@ mod read_ssh {
 }
 
 mod write_ssh {
-    use cookie_factory::{bytes::be_u32, combinator::slice, sequence::tuple, SerializeFn};
-    use rsa::{traits::PublicKeyParts, BoxedUint};
+    use cookie_factory::{SerializeFn, bytes::be_u32, combinator::slice, sequence::tuple};
+    use rsa::{BoxedUint, traits::PublicKeyParts};
     use std::io::Write;
 
     use super::SSH_RSA_KEY_PREFIX;
