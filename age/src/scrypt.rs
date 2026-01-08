@@ -11,7 +11,7 @@ use age_core::{
 };
 use base64::{Engine, prelude::BASE64_STANDARD_NO_PAD};
 use rand::{
-    RngCore,
+    Rng,
     distr::{Alphanumeric, SampleString},
 };
 use zeroize::Zeroize;

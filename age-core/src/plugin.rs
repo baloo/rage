@@ -3,7 +3,7 @@
 //! These are shared between the client implementation in the `age` crate, and the plugin
 //! implementations built around the `age-plugin` crate.
 
-use rand::{Rng, rng};
+use rand::{RngExt, rng};
 use secrecy::zeroize::Zeroize;
 use std::env;
 use std::fmt;

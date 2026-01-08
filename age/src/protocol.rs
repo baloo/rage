@@ -1,7 +1,7 @@
 //! Encryption and decryption routines for age.
 
 use age_core::{format::is_arbitrary_string, secrecy::SecretString};
-use rand::RngCore;
+use rand::Rng;
 
 use std::io::{self, BufRead, Read, Write};
 use std::iter;

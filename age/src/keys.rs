@@ -5,7 +5,7 @@ use age_core::{
     primitives::hkdf,
     secrecy::{ExposeSecret, SecretBox},
 };
-use rand::RngCore;
+use rand::Rng;
 
 use crate::{
     error::DecryptError,

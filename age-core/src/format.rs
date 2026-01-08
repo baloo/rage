@@ -2,7 +2,7 @@
 
 use base64::{Engine, prelude::BASE64_STANDARD_NO_PAD};
 use rand::{
-    RngCore,
+    Rng,
     distr::{Distribution, Uniform},
     rng,
 };
@@ -122,7 +122,7 @@ pub fn is_arbitrary_string<S: AsRef<str>>(s: &S) -> bool {
 /// about the stanza's fields.
 pub fn grease_the_joint() -> Stanza {
     // Generate arbitrary strings between 1 and 9 characters long.
-    fn gen_arbitrary_string<R: RngCore>(rng: &mut R) -> String {
+    fn gen_arbitrary_string<R: Rng + ?Sized>(rng: &mut R) -> String {
         let length = Uniform::try_from(1..9).unwrap().sample(rng);
         Uniform::try_from(33..=126)
             .unwrap()

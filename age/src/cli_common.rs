@@ -3,7 +3,7 @@
 use age_core::secrecy::{ExposeSecret, SecretString};
 use pinentry::{ConfirmationDialog, PassphraseInput};
 use rand::{
-    CryptoRng, RngCore,
+    CryptoRng,
     distr::{Distribution, Uniform},
 };
 use rpassword::prompt_password;
@@ -182,13 +182,13 @@ pub enum Passphrase {
 
 impl Passphrase {
     /// Generates a secure passphrase.
-    pub fn random<R: RngCore + CryptoRng>(mut rng: R) -> Self {
+    pub fn random<R: CryptoRng + ?Sized>(rng: &mut R) -> Self {
         let between = Uniform::try_from(0..2048).unwrap();
         let new_passphrase = (0..10)
             .map(|_| {
                 BIP39_WORDLIST
                     .lines()
-                    .nth(between.sample(&mut rng))
+                    .nth(between.sample(rng))
                     .expect("index is in range")
             })
             .fold(String::new(), |acc, s| {
@@ -211,7 +211,7 @@ pub fn read_or_generate_passphrase() -> pinentry::Result<Passphrase> {
     )?;
 
     if res.expose_secret().is_empty() {
-        Ok(Passphrase::random(rand::rng()))
+        Ok(Passphrase::random(&mut rand::rng()))
     } else {
         Ok(Passphrase::Typed(res))
     }
